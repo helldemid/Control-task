@@ -1,0 +1,84 @@
+<html>
+
+<head>
+	<!-- Подключаем AR.js и Three.js -->
+	<script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.6/three.js/build/ar.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+</head>
+
+<body style="margin: 0; overflow: hidden;">
+	<script>
+		// Настраиваем сцену, камеру и рендерер
+		let scene = new THREE.Scene();
+		let camera = new THREE.Camera();
+		scene.add(camera);
+
+		let renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.domElement.style.position = 'absolute';
+		renderer.domElement.style.top = '0px';
+		renderer.domElement.style.left = '0px';
+		document.body.appendChild(renderer.domElement);
+
+		// Подключаем камеру и AR-систему (AR Toolkit)
+		let arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+
+		arToolkitSource.init(() => {
+			setTimeout(() => {
+				onResize();
+			}, 2000);
+		});
+
+		window.addEventListener('resize', () => onResize());
+
+		function onResize() {
+			arToolkitSource.onResizeElement();
+			arToolkitSource.copyElementSizeTo(renderer.domElement);
+			if (arToolkitContext.arController !== null) {
+				arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+			}
+		}
+
+		let arToolkitContext = new THREEx.ArToolkitContext({
+			cameraParametersUrl: 'https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.6/data/camera_para.dat',
+			detectionMode: 'mono'
+		});
+
+		arToolkitContext.init(() => {
+			camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+		});
+
+		// Создаем "корень" для маркера (группа объектов)
+		let markerRoot = new THREE.Group();
+		scene.add(markerRoot);
+
+		// Настраиваем маркер, заменив 'pattern-marker.patt' на твой файл
+		let markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+			type: 'pattern',
+			patternUrl: 'pattern-marker.patt' // сюда путь к твоему паттерну
+		});
+
+		// Здесь создаём твою 3D модель — заменяй на свою фигуру
+		let geometry = new THREE.BoxGeometry(1, 1, 1); // куб
+		let material = new THREE.MeshNormalMaterial();
+		let mesh = new THREE.Mesh(geometry, material);
+		markerRoot.add(mesh);
+
+		// Анимация и рендер
+		function animate() {
+			requestAnimationFrame(animate);
+
+			if (arToolkitSource.ready) {
+				arToolkitContext.update(arToolkitSource.domElement);
+			}
+
+			mesh.rotation.x += 0.01;
+			mesh.rotation.y += 0.01;
+
+			renderer.render(scene, camera);
+		}
+		animate();
+	</script>
+</body>
+
+</html>
