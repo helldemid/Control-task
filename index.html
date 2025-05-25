@@ -1,110 +1,44 @@
-<!-- <html>
-
-<head>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
-	<script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-</head>
-
-<body style="margin: 0; overflow: hidden;">
-	<h1>Hello</h1>
-	<script>
-		// Настраиваем сцену, камеру и рендерер
-		let scene = new THREE.Scene();
-		let camera = new THREE.Camera();
-		scene.add(camera);
-
-		let renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.domElement.style.position = 'absolute';
-		renderer.domElement.style.top = '0px';
-		renderer.domElement.style.left = '0px';
-		document.body.appendChild(renderer.domElement);
-
-		// Подключаем камеру и AR-систему (AR Toolkit)
-		let arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-
-		arToolkitSource.init(() => {
-			setTimeout(() => {
-				onResize();
-			}, 2000);
-		});
-
-		window.addEventListener('resize', () => onResize());
-
-		function onResize() {
-			arToolkitSource.onResizeElement();
-			arToolkitSource.copyElementSizeTo(renderer.domElement);
-			if (arToolkitContext.arController !== null) {
-				arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
-			}
-		}
-
-		let arToolkitContext = new THREEx.ArToolkitContext({
-			cameraParametersUrl: 'https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.6/data/camera_para.dat',
-			detectionMode: 'mono'
-		});
-
-		arToolkitContext.init(() => {
-			camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-		});
-
-		// Создаем "корень" для маркера (группа объектов)
-		let markerRoot = new THREE.Group();
-		scene.add(markerRoot);
-
-		// Настраиваем маркер, заменив 'pattern-marker.patt' на твой файл
-		let markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-			type: 'pattern',
-			patternUrl: 'pattern-marker.patt' // сюда путь к твоему паттерну
-		});
-
-		// Здесь создаём твою 3D модель — заменяй на свою фигуру
-		let geometry = new THREE.BoxGeometry(1, 1, 1); // куб
-		let material = new THREE.MeshNormalMaterial();
-		let mesh = new THREE.Mesh(geometry, material);
-		markerRoot.add(mesh);
-
-		// Анимация и рендер
-		function animate() {
-			requestAnimationFrame(animate);
-
-			if (arToolkitSource.ready) {
-				arToolkitContext.update(arToolkitSource.domElement);
-			}
-
-			mesh.rotation.x += 0.01;
-			mesh.rotation.y += 0.01;
-
-			renderer.render(scene, camera);
-		}
-		animate();
-	</script>
-</body>
-
-</html> -->
-<!DOCTYPE html>
 <html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@4.2.0/three.js/build/ar-threex.min.js"></script>
+	<script src="./Surface.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs>
+      <!-- Добавляем трехмерный объект как дочерний к маркеру -->
+      <a-marker type="pattern" url="hiro" id="marker">
+        <a-entity id="threejs-container"></a-entity>
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
 
-<head>
-	<title>Простой AR.js пример</title>
-	<!-- Подключаем A-Frame и AR.js -->
-	<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
-</head>
+    <script>
+      // Получаем контейнер для трех.js
+      const container = document.querySelector('#threejs-container');
 
-<body style="margin: 0; overflow: hidden;">
-	<!-- AR-сцена -->
-	<a-scene embedded arjs>
-		<!-- Маркер Hiro -->
-		<a-marker preset="hiro">
-			<!-- 3D кубик -->
-			<a-box position="0 0.5 0" material="color: blue;"></a-box>
-		</a-marker>
+      // Создаем сцену, камеру и рендерер three.js
+      const scene = new THREE.Scene();
 
-		<!-- Камера -->
-		<a-entity camera></a-entity>
-	</a-scene>
-</body>
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      camera.position.z = 5;
 
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      // Создаем объект (используем SurfaceThreeJS из предыдущего ответа)
+      const surface = new SurfaceThreeJS('MySurface', 2, 1, 50, 50);
+      const mesh = surface.createMesh();
+      scene.add(mesh);
+
+      // Обновляем рендер
+      function animate() {
+        requestAnimationFrame(animate);
+        mesh.rotation.y += 0.01; // небольшой поворот для красоты
+        renderer.render(scene, camera);
+      }
+      animate();
+    </script>
+  </body>
 </html>
