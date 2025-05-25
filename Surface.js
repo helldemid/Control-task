@@ -65,7 +65,7 @@ class SurfaceThreeJS {
         const material = new THREE.MeshStandardMaterial({
             color: 0x049ef4,
             metalness: 0.5,
-            roughness: 0.5,
+            roughness: 0.2,
             side: THREE.DoubleSide,
         });
 
