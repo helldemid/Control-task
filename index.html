@@ -42,14 +42,16 @@
 		// }
 		// animate();
 		// Ждем загрузки сцены A-Frame
+		// ...existing code...
 		document.addEventListener('DOMContentLoaded', () => {
 			const entity = document.querySelector('#surface-entity');
-			// Создаем объект
-			const surface = new SurfaceThreeJS('MySurface', 2, 1, 50, 50);
-			const mesh = surface.createMesh();
-			// Добавляем three.js-меш в object3D сущности A-Frame
-			entity.object3D.add(mesh);
+			entity.addEventListener('loaded', () => {
+				const surface = new SurfaceThreeJS('MySurface', 2, 1, 50, 50);
+				const mesh = surface.createMesh();
+				entity.object3D.add(mesh);
+			});
 		});
+		// ...existing code...
 	</script>
 </body>
 
