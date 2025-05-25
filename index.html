@@ -8,57 +8,59 @@
 	<script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
 	<script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
 	<script src="./Surface.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-	<link rel="stylesheet" href="./css/styles.css">
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+	<link rel="stylesheet" href="./css/styles.css"> -->
 </head>
 
 <body style="margin:0; overflow:hidden;">
 	<div id="ar-container"></div>
 	<script>
-		var scene = new THREE.Scene();
-		var camera = new THREE.Camera();
-		scene.add(camera);
+		document.addEventListener('DOMContentLoaded', function () {
+			var scene = new THREE.Scene();
+			var camera = new THREE.Camera();
+			scene.add(camera);
 
-		var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		document.getElementById('ar-container').appendChild(renderer.domElement);
+			var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.getElementById('ar-container').appendChild(renderer.domElement);
 
-		var arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-		arSource.init(function onReady() { onResize() });
-		window.addEventListener('resize', function () { onResize() });
-		function onResize() {
-			arSource.onResizeElement();
-			arSource.copyElementSizeTo(renderer.domElement);
-			if (arContext.arController !== null) {
-				arSource.copyElementSizeTo(arContext.arController.canvas);
+			var arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+			arSource.init(function onReady() { onResize() });
+			window.addEventListener('resize', function () { onResize() });
+			function onResize() {
+				arSource.onResizeElement();
+				arSource.copyElementSizeTo(renderer.domElement);
+				if (arContext.arController !== null) {
+					arSource.copyElementSizeTo(arContext.arController.canvas);
+				}
 			}
-		}
 
-		var arContext = new THREEx.ArToolkitContext({
-			cameraParametersUrl: './data/camera_para.dat',
-			detectionMode: 'mono'
+			var arContext = new THREEx.ArToolkitContext({
+				cameraParametersUrl: './data/camera_para.dat',
+				detectionMode: 'mono'
+			});
+			arContext.init(function onCompleted() {
+				camera.projectionMatrix.copy(arContext.getProjectionMatrix());
+			});
+
+			var markerRoot = new THREE.Group();
+			scene.add(markerRoot);
+			var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
+				type: 'pattern',
+				patternUrl: './data/hiro.patt',
+			});
+
+			var surface = new SurfaceThreeJS('MySurface', 1, 1, 50, 50);
+			var mesh = surface.createMesh();
+			markerRoot.add(mesh);
+
+			function animate() {
+				requestAnimationFrame(animate);
+				if (arSource.ready) arContext.update(arSource.domElement);
+				renderer.render(scene, camera);
+			}
+			animate();
 		});
-		arContext.init(function onCompleted() {
-			camera.projectionMatrix.copy(arContext.getProjectionMatrix());
-		});
-
-		var markerRoot = new THREE.Group();
-		scene.add(markerRoot);
-		var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
-			type: 'pattern',
-			patternUrl: './data/hiro.patt',
-		});
-
-		var surface = new SurfaceThreeJS('MySurface', 1, 1, 50, 50);
-		var mesh = surface.createMesh();
-		markerRoot.add(mesh);
-
-		function animate() {
-			requestAnimationFrame(animate);
-			if (arSource.ready) arContext.update(arSource.domElement);
-			renderer.render(scene, camera);
-		}
-		animate();
 	</script>
 </body>
 
