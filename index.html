@@ -20,6 +20,12 @@
 			var camera = new THREE.Camera();
 			scene.add(camera);
 
+			var light = new THREE.AmbientLight(0xffffff, 0.8);
+			scene.add(light);
+			var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+			directionalLight.position.set(1, 1, 1);
+			scene.add(directionalLight);
+
 			var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.getElementById('ar-container').appendChild(renderer.domElement);
@@ -52,6 +58,7 @@
 
 			var surface = new SurfaceThreeJS('MySurface', 1, 1, 50, 50);
 			var mesh = surface.createMesh();
+			mesh.rotation.x = -Math.PI / 2;
 			markerRoot.add(mesh);
 
 			function animate() {
