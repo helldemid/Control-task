@@ -63,7 +63,7 @@ class SurfaceThreeJS {
     // Создаем меш с материалом
     createMesh() {
         const material = new THREE.MeshStandardMaterial({
-            color: 0x6699ff,
+            color: 0x049ef4,
             metalness: 0.5,
             roughness: 0.5,
             side: THREE.DoubleSide,
