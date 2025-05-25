@@ -38,7 +38,7 @@
 		}
 
 		var arContext = new THREEx.ArToolkitContext({
-			cameraParametersUrl: 'https://cdn.jsdelivr.net/npm/ar.js@4.2.0/data/data/camera_para.dat',
+			cameraParametersUrl: './data/camera_para.dat',
 			detectionMode: 'mono'
 		});
 		arContext.init(function onCompleted() {
@@ -49,7 +49,7 @@
 		scene.add(markerRoot);
 		var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
 			type: 'pattern',
-			patternUrl: 'https://cdn.jsdelivr.net/npm/ar.js@4.2.0/data/data/patt.hiro'
+			patternUrl: './data/hiro.patt',
 		});
 
 		var surface = new SurfaceThreeJS('MySurface', 2, 1, 50, 50);
