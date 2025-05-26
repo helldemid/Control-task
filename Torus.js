@@ -1,4 +1,4 @@
-class Model {
+class Torus {
     constructor() {
         this.geometry = new THREE.BufferGeometry();
         this.material = new THREE.MeshStandardMaterial({ color: 0x66007a, side: THREE.DoubleSide, metalness: 0.4, roughness: 0.4 });
