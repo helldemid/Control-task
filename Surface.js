@@ -16,7 +16,6 @@ class SurfaceThreeJS {
     updateSurfaceData() {
         const positions = [];
         const indices = [];
-        const normals = [];
         const uvs = [];
 
         const vMax = 2 * Math.PI;
