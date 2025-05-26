@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Set up marker controls for pattern recognition
     var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
         type: 'pattern',
-        patternUrl: './configuration/ghost_tracker.patt',
+        patternUrl: './configuration/pattern-bat.patt',
     });
 
     // Create a custom surface mesh and add it to the marker root
