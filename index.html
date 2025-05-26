@@ -62,33 +62,7 @@
 			var surface = new SurfaceThreeJS('MySurface', 1, 1, 50, 50);
 			var mesh = surface.createMesh();
 			mesh.rotation.x = -Math.PI / 6;
-			// Создаём прозрачный "стеклянный" куб
-			var glassMaterial = new THREE.MeshPhysicalMaterial({
-				color: 0x88ccff,
-				transparent: true,
-				opacity: 0.25,
-				roughness: 0.1,
-				metalness: 0.1,
-				transmission: 0.9, // для эффекта стекла (Three.js r125+)
-				thickness: 0.5,
-				side: THREE.DoubleSide
-			});
-			var boxSize = 2; // Размер куба, подберите под вашу фигуру
-			var glassCube = new THREE.Mesh(
-				new THREE.BoxGeometry(boxSize, boxSize, boxSize),
-				glassMaterial
-			);
-
-			// Группируем куб и вашу фигуру
-			var group = new THREE.Group();
-			group.add(glassCube);
-			group.add(mesh);
-
-			// Центрируем вашу фигуру внутри куба (если нужно)
-			mesh.position.set(0, 0, 0);
-
-			// Добавляем группу на маркер
-			markerRoot.add(group);
+			markerRoot.add(mesh);
 
 			function animate() {
 				requestAnimationFrame(animate);
