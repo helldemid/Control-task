@@ -2,101 +2,17 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<title>Three.js + AR.js Example</title>
-	<script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
-	<script src="./Torus.js"></script>
-
+    <meta charset="utf-8">
+    <title>CT</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
+    <script src="./Surface.js"></script>
 </head>
 
 <body style="margin:0; overflow:hidden;">
-	<div id="ar-container"></div>
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			// Create a new Three.js scene
-			var scene = new THREE.Scene();
-
-			// Create a camera and add it to the scene
-			var camera = new THREE.Camera();
-			scene.add(camera);
-
-			// Add ambient light to the scene
-			var light = new THREE.AmbientLight(0xffffff, 0.8);
-			scene.add(light);
-
-			// Add directional light to the scene
-			var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-			directionalLight.position.set(1, 1, 1);
-			scene.add(directionalLight);
-
-			// Create a WebGL renderer and add it to the DOM
-			var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			document.getElementById('ar-container').appendChild(renderer.domElement);
-
-			// Initialize AR source (webcam)
-			var arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-
-			// Handle resizing of the renderer and AR elements
-			function onResize() {
-				arSource.onResizeElement();
-				arSource.copyElementSizeTo(renderer.domElement);
-				if (arContext.arController !== null) {
-					arSource.copyElementSizeTo(arContext.arController.canvas);
-				}
-				renderer.setSize(window.innerWidth, window.innerHeight, false);
-			}
-
-			// Initialize AR source and set up resize listeners
-			arSource.init(function onReady() {
-				onResize();
-			});
-			window.addEventListener('resize', function () { onResize(); });
-			window.addEventListener('orientationchange', function () { setTimeout(onResize, 500); });
-
-			// Initialize AR context with camera parameters
-			var arContext = new THREEx.ArToolkitContext({
-				cameraParametersUrl: './configuration/webcam_parameters.dat',
-				detectionMode: 'mono'
-			});
-
-			// Copy AR projection matrix to camera when AR context is ready
-			arContext.init(function onCompleted() {
-				camera.projectionMatrix.copy(arContext.getProjectionMatrix());
-			});
-
-			// Create a group for the marker root and add it to the scene
-			var markerRoot = new THREE.Group();
-			scene.add(markerRoot);
-
-			// Set up marker controls for pattern recognition
-			var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
-				type: 'pattern',
-				patternUrl: './configuration/ghost_tracker.patt',
-			});
-
-			// Create a custom surface mesh and add it to the marker root
-			var model = new Torus();
-			var mesh = model.getMesh();
-			markerRoot.add(mesh);
-
-			// Animation loop: update AR context, rotate mesh, and render the scene
-			function animate() {
-				requestAnimationFrame(animate);
-				if (arSource.ready) arContext.update(arSource.domElement);
-
-				group.rotation.y += 0.02;
-				group.rotation.x = Math.sin(t) * 0.2;
-				mesh.rotation.z += 0.05 + 0.03 * Math.sin(t * 3);
-				t += 0.02;
-
-				renderer.render(scene, camera);
-			}
-			animate();
-		});
-	</script>
+    <div id="ar-container"></div>
+    <script src="./main.js"></script>
 </body>
 
 </html>
