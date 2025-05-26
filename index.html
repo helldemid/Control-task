@@ -1,79 +1,115 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-	<meta charset="utf-8">
-	<title>Three.js + AR.js Example</title>
-	<script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
-	<script src="./Surface.js"></script>
-	<script src="./Torus.js"></script>
+    <meta charset="utf-8">
+    <title>Three.js + AR.js Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
+    <script src="./Torus.js"></script>
+
 </head>
-
 <body style="margin:0; overflow:hidden;">
-	<div id="ar-container"></div>
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			var scene = new THREE.Scene();
-			var camera = new THREE.Camera();
-			scene.add(camera);
+    <div id="ar-container"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Scene and Camera ---
+            var scene = new THREE.Scene();
+            var camera = new THREE.Camera();
+            scene.add(camera);
 
-			var light = new THREE.AmbientLight(0xffffff, 0.8);
-			scene.add(light);
-			var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-			directionalLight.position.set(1, 1, 1);
-			scene.add(directionalLight);
+            // --- Light ---
+            addLights(scene);
 
-			var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			document.getElementById('ar-container').appendChild(renderer.domElement);
+            // --- Renderer ---
+            var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('ar-container').appendChild(renderer.domElement);
 
-			var arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-			function onResize() {
-				arSource.onResizeElement();
-				arSource.copyElementSizeTo(renderer.domElement);
-				if (arContext.arController !== null) {
-					arSource.copyElementSizeTo(arContext.arController.canvas);
-				}
-				// Принудительно обновляем размеры canvas
-				renderer.setSize(window.innerWidth, window.innerHeight, false);
-			}
-			arSource.init(function onReady() {
-				onResize();
-			});
-			window.addEventListener('resize', function () { onResize(); });
-			window.addEventListener('orientationchange', function () { setTimeout(onResize, 500); });
+            // --- AR.js Source and Context ---
+            var arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+            arSource.init(function onReady() { onResize(); });
+            window.addEventListener('resize', function () { onResize(); });
+            window.addEventListener('orientationchange', function () { setTimeout(onResize, 500); });
 
-			var arContext = new THREEx.ArToolkitContext({
-				cameraParametersUrl: './data/camera_para.dat',
-				detectionMode: 'mono'
-			});
-			arContext.init(function onCompleted() {
-				camera.projectionMatrix.copy(arContext.getProjectionMatrix());
-			});
+            function onResize() {
+                arSource.onResizeElement();
+                arSource.copyElementSizeTo(renderer.domElement);
+                if (arContext.arController !== null) {
+                    arSource.copyElementSizeTo(arContext.arController.canvas);
+                }
+                renderer.setSize(window.innerWidth, window.innerHeight, false);
+            }
 
-			var markerRoot = new THREE.Group();
-			scene.add(markerRoot);
-			var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
-				type: 'pattern',
-				patternUrl: './data/VR_Study_Logo.patt',
-			});
+            var arContext = new THREEx.ArToolkitContext({
+                cameraParametersUrl: './configuration/webcam_parameters.dat',
+                detectionMode: 'mono'
+            });
+            arContext.init(function onCompleted() {
+                camera.projectionMatrix.copy(arContext.getProjectionMatrix());
+            });
 
-			var model = new Torus();
-			var mesh = model.getMesh();
-			mesh.rotation.x = -Math.PI / 6;
-			markerRoot.add(mesh);
+            // --- Marker ---
+            var markerRoot = new THREE.Group();
+            scene.add(markerRoot);
+            var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
+                type: 'pattern',
+                patternUrl: './configuration/pattern-ghost.patt',
+            });
 
-			function animate() {
-				requestAnimationFrame(animate);
-				if (arSource.ready) arContext.update(arSource.domElement);
-				mesh.rotation.z += 0.05;
-				renderer.render(scene, camera);
-			}
-			animate();
-		});
-	</script>
+            // --- 3D Objects ---
+            var group = new THREE.Group();
+
+            var glassCube = createGlassCube(2);
+            group.add(glassCube);
+
+            var model = new Torus();
+            var mesh = model.getMesh();
+            mesh.rotation.x = -Math.PI / 6;
+            group.add(mesh);
+
+            markerRoot.add(group);
+
+            // --- Animation ---
+            let t = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                if (arSource.ready) arContext.update(arSource.domElement);
+
+                group.rotation.y += 0.02;
+                group.rotation.x = Math.sin(t) * 0.2;
+                glassCube.material.opacity = 0.2 + 0.1 * Math.abs(Math.sin(t * 2));
+                mesh.rotation.z += 0.05 + 0.03 * Math.sin(t * 3);
+                t += 0.02;
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // --- Helpers ---
+            function addLights(scene) {
+                scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                var dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+                dirLight.position.set(1, 1, 1);
+                scene.add(dirLight);
+            }
+
+            function createGlassCube(size) {
+                return new THREE.Mesh(
+                    new THREE.BoxGeometry(size, size, size),
+                    new THREE.MeshPhysicalMaterial({
+                        color: 0x88ccff,
+                        transparent: true,
+                        opacity: 0.25,
+                        roughness: 0.1,
+                        metalness: 0.1,
+                        transmission: 0.9,
+                        thickness: 0.5,
+                        side: THREE.DoubleSide
+                    })
+                );
+            }
+        });
+    </script>
 </body>
-
 </html>

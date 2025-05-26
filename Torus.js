@@ -51,13 +51,13 @@ class Torus {
             }
         }
 
-        // Создаем BufferGeometry и добавляем атрибуты
+        // create BufferGeometry and set attributes
         this.geometry.setIndex(indices);
         this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         this.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(texCoords, 2));
         this.geometry.computeVertexNormals();
 
-        // Создаем Mesh
+        // create Mesh
         this.mesh = new THREE.Mesh(this.geometry, this.material);
     }
 
