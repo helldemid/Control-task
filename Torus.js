@@ -13,7 +13,7 @@ class Torus {
         let indices = [];
 
         let a = 0.6;
-        let r = 1.2;
+        let r = 0.8;
         let vSegments = 50;
         let uSegments = 50;
         let theta = 0.25 * Math.PI;
