@@ -1,31 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
     const errorNode = document.getElementById('errors');
+    function logStep(msg) {
+        errorNode.innerHTML += `<p>${msg}</p>`;
+    }
     try {
-        // Create a new Three.js scene
+        logStep('Создание сцены...');
         var scene = new THREE.Scene();
 
-        // Create a camera and add it to the scene
+        logStep('Создание камеры...');
         var camera = new THREE.Camera();
         scene.add(camera);
 
-        // Add ambient light to the scene
+        logStep('Добавление света...');
         var light = new THREE.AmbientLight(0xffffff, 0.8);
         scene.add(light);
-
-        // Add directional light to the scene
         var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
         directionalLight.position.set(1, 1, 1);
         scene.add(directionalLight);
 
-        // Create a WebGL renderer and add it to the DOM
+        logStep('Создание рендерера...');
         var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('ar-container').appendChild(renderer.domElement);
 
-        // Initialize AR source (webcam)
+        logStep('Инициализация AR источника...');
         var arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
 
-        // Handle resizing of the renderer and AR elements
         function onResize() {
             arSource.onResizeElement();
             arSource.copyElementSizeTo(renderer.domElement);
@@ -35,40 +35,40 @@ document.addEventListener('DOMContentLoaded', function () {
             renderer.setSize(window.innerWidth, window.innerHeight, false);
         }
 
-        // Initialize AR source and set up resize listeners
+        logStep('Настройка resize listeners...');
         arSource.init(function onReady() {
             onResize();
         });
         window.addEventListener('resize', function () { onResize(); });
         window.addEventListener('orientationchange', function () { setTimeout(onResize, 500); });
 
-        // Initialize AR context with camera parameters
+        logStep('Инициализация AR контекста...');
         var arContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: './configuration/camParameters.dat',
             detectionMode: 'mono'
         });
 
-        // Copy AR projection matrix to camera when AR context is ready
         arContext.init(function onCompleted() {
             camera.projectionMatrix.copy(arContext.getProjectionMatrix());
+            logStep('AR контекст готов!');
         });
 
-        // Create a group for the marker root and add it to the scene
+        logStep('Создание marker root...');
         var markerRoot = new THREE.Group();
         scene.add(markerRoot);
 
-        // Set up marker controls for pattern recognition
+        logStep('Настройка marker controls...');
         var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
             type: 'pattern',
             patternUrl: './configuration/VR_Study_Logo.patt',
         });
 
-        // Create a custom surface mesh and add it to the marker root
+        logStep('Добавление фигуры...');
         var surface = new Torus();
         var mesh = surface.getMesh();
         markerRoot.add(mesh);
 
-        // Animation loop: update AR context, rotate mesh, and render the scene
+        logStep('Запуск анимации...');
         function animate() {
             requestAnimationFrame(animate);
             if (arSource.ready) arContext.update(arSource.domElement);
@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', function () {
             renderer.render(scene, camera);
         }
         animate();
+        logStep('Готово!');
     } catch (error) {
-        errorNode.innerHTML += `<p>${error.message}</p>`;
+        errorNode.innerHTML += `<p style="color:red">${error.message}</p>`;
     }
 });
