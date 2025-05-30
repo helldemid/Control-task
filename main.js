@@ -72,7 +72,13 @@ document.addEventListener('DOMContentLoaded', function () {
         function animate() {
             requestAnimationFrame(animate);
             if (arSource.ready) arContext.update(arSource.domElement);
-            mesh.rotation.z += 0.05;
+            mesh.rotation.y += 0.02;
+            mesh.rotation.x = Math.sin(t) * 0.2;
+            mesh.material.opacity = 0.7 + 0.3 * Math.abs(Math.sin(t * 2)); // если материал поддерживает прозрачность
+            mesh.scale.setScalar(1 + 0.2 * Math.sin(t * 3)); // пульсация размера
+
+            t += 0.02;
+
             renderer.render(scene, camera);
         }
         animate();
