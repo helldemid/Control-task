@@ -12,8 +12,8 @@ class Torus {
         let texCoords = [];
         let indices = [];
 
-        let a = 0.6;
-        let r = 0.8;
+        let a = 0.4;
+        let r = 0.6;
         let vSegments = 50;
         let uSegments = 50;
         let theta = 0.25 * Math.PI;
