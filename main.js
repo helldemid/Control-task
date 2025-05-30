@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         markerRoot.add(mesh);
 
         logStep('Запуск анимации...');
+        let t = 0;
         function animate() {
             requestAnimationFrame(animate);
             if (arSource.ready) arContext.update(arSource.domElement);
