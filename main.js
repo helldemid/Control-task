@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var markerControls = new THREEx.ArMarkerControls(arContext, markerRoot, {
             type: 'pattern',
-            patternUrl: './configuration/pattern-marker.patt',
+            patternUrl: './configuration/marker.patt',
         });
 
         var surface = new Torus();
